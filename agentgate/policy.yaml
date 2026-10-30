@@ -1,0 +1,41 @@
+# TRUSTED policy. Only this file decides who may do what.
+# Document text and LLM output can never change anything in here.
+
+principals:          # identity -> role
+  alice: admin
+  bob: analyst
+  mallory: guest
+
+roles:
+  admin:
+    operations: [read_document, save_report, deliver_inbox, declassify]
+    max_read: SECRET
+  analyst:
+    operations: [read_document, save_report, deliver_inbox]
+    max_read: CONFIDENTIAL
+  guest:
+    operations: [read_document]
+    max_read: PUBLIC
+
+recipients:          # mock inboxes; anything not listed is unauthorized
+  internal@corp.example:
+    clearance: CONFIDENTIAL
+  secure@corp.example:
+    clearance: SECRET
+  partner@external.example:
+    clearance: PUBLIC
+    external: true
+
+documents:           # classification registry for source documents
+  public_faq.md:
+    sensitivity: PUBLIC
+    integrity: TRUSTED
+  q3_financials.md:
+    sensitivity: CONFIDENTIAL
+    integrity: TRUSTED
+  merger_plan.md:
+    sensitivity: SECRET
+    integrity: TRUSTED
+  vendor_note.md:    # third-party content: low sensitivity, but untrusted
+    sensitivity: PUBLIC
+    integrity: UNTRUSTED
